@@ -4,6 +4,7 @@
 */
 
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 class DrawerDemo extends StatefulWidget{
 
@@ -129,7 +130,23 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
   ///避免滑动过快，溢出阈值
   final double cacheDy = 5.0;
 
+  markDrawerLvl(){
+    double l1 = (top1-initPositionTop).abs();
+    double l2 = (top2-initPositionTop).abs();
+    double l3 = (top3-initPositionTop).abs();
+
+    if(l1 == (math.min(l1, math.min(l2, l3)))){
+      drawerLvl = DrawerLvl.LVL1;
+    }else if(l2 == (math.min(l1, math.min(l2, l3)))){
+      drawerLvl = DrawerLvl.LVL2;
+    }else {
+      drawerLvl = DrawerLvl.LVL3;
+    }
+    log('lvl', '$drawerLvl');
+  }
+
   void verticalDragStart(DragStartDetails details){
+    markDrawerLvl();
     animation = null;
     if(animationController.isAnimating){
       animationController.stop();
@@ -163,61 +180,94 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
   }
 
   void verticalDragEnd(DragEndDetails details){
-    adjustPositionTop();
+    adjustPositionTop(details);
     direction = null;
     //lastPos = Offset.zero;
   }
 
-  void adjustPositionTop(){
+  double thresholdV = 1500;
+
+  void adjustPositionTop(DragEndDetails details){
+    log('velocity', '${details.velocity}');
     switch(direction){
       case SlideDirection.Up:
-        if(initPositionTop >= top1 && initPositionTop <= top2){
-          ///在1、2级之间
-
-          if(initPositionTop <= threshold1To2){
-            ///小于二分之一屏幕高度 滚向top1
-
-            slideTo(begin:initPositionTop, end:top1);
-          }else{
-            ///滑向top2
-
-            slideTo(begin: initPositionTop,end: top2);
+        if(details.velocity.pixelsPerSecond.dy.abs() > thresholdV){
+          ///用户fling速度超过阈值后，直接判定为滑向顶部
+          switch(drawerLvl){
+            case DrawerLvl.LVL1:
+              // TODO: Handle this case.
+              break;
+            case DrawerLvl.LVL2:
+              slideTo(begin: initPositionTop,end: top1);
+              break;
+            case DrawerLvl.LVL3:
+              slideTo(begin: initPositionTop,end: top2);
+              break;
           }
-        }else if(initPositionTop >= top2 && initPositionTop <= top3){
-          ///2-3之间
-          if(initPositionTop <= threshold2To3){
-            ///滑向2
-            slideTo(begin: initPositionTop,end: top2);
-          }else{
-            ///滑向3
-            slideTo(begin: initPositionTop,end: top3);
-          }
+        }else{
+          if(initPositionTop >= top1 && initPositionTop <= top2){
+            ///在1、2级之间
 
+            if(initPositionTop <= threshold1To2){
+              ///小于二分之一屏幕高度 滚向top1
+
+              slideTo(begin:initPositionTop, end:top1);
+            }else{
+              ///滑向top2
+
+              slideTo(begin: initPositionTop,end: top2);
+            }
+          }else if(initPositionTop >= top2 && initPositionTop <= top3){
+            ///2-3之间
+            if(initPositionTop <= threshold2To3){
+              ///滑向2
+              slideTo(begin: initPositionTop,end: top2);
+            }else{
+              ///滑向3
+              slideTo(begin: initPositionTop,end: top3);
+            }
+
+          }
         }
         break;
       case SlideDirection.Down:
-        if(initPositionTop >= top1 && initPositionTop <= top2){
-          ///在1、2级之间
+        if(details.velocity.pixelsPerSecond.dy.abs() > thresholdV){
 
-          if(initPositionTop <= threshold1To2){
-            ///小于二分之一屏幕高度 滚向top1
-
-            slideTo(begin: initPositionTop,end:top1);
-          }else{
-            ///滑向top2
-
-            slideTo(begin: initPositionTop,end: top2);
+          switch(drawerLvl){
+            case DrawerLvl.LVL1:
+              slideTo(begin: initPositionTop,end: top2);
+              break;
+            case DrawerLvl.LVL2:
+              slideTo(begin: initPositionTop,end: top3);
+              break;
+            case DrawerLvl.LVL3:
+              //todo nothing
+              break;
           }
-        }else if(initPositionTop >= top2 && initPositionTop <= top3){
-          ///2-3之间
-          if(initPositionTop <= threshold2To3){
-            ///滑向2
-            slideTo(begin: initPositionTop,end: top2);
-          }else{
-            ///滑向3
-            slideTo(begin: initPositionTop,end: top3);
-          }
+        }else{
+          if(initPositionTop >= top1 && initPositionTop <= top2){
+            ///在1、2级之间
 
+            if(initPositionTop <= threshold1To2){
+              ///小于二分之一屏幕高度 滚向top1
+
+              slideTo(begin: initPositionTop,end:top1);
+            }else{
+              ///滑向top2
+
+              slideTo(begin: initPositionTop,end: top2);
+            }
+          }else if(initPositionTop >= top2 && initPositionTop <= top3){
+            ///2-3之间
+            if(initPositionTop <= threshold2To3){
+              ///滑向2
+              slideTo(begin: initPositionTop,end: top2);
+            }else{
+              ///滑向3
+              slideTo(begin: initPositionTop,end: top3);
+            }
+
+          }
         }
         break;
     }
