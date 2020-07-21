@@ -57,12 +57,15 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
   AnimationController animationController;
   Animation animation;
 
+  ///内部 扩展区widget的 position top
+  double expandPosTop;
 
+  double topArea ;
 
-  ///position top's flag
-  double top1;
-  double top2;
-  double top3;
+  ///stack 中 根container 的position 的top 值的三种情况
+  double top1;// DrawerLvl   lvl 1
+  double top2;// DrawerLvl   lvl 2
+  double top3;// DrawerLvl   lvl 3
 
   ///页面初始
   double initPositionTop;
@@ -74,6 +77,11 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
   @override
   void initState() {
+
+    expandPosTop = searchHeight - minHeight + rowH;
+    topArea = 0;
+    log('init top', '$expandPosTop');
+
     animationController = AnimationController(vsync: this,duration: Duration(milliseconds: 300));
 
     top1 = size.height - drawerHeight;
@@ -84,6 +92,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
     animationController.addListener(() {
       if(animation == null) return;
+      refreshExpandWidgetTop();
       setState(() {
         log('animation', '${animation.value}');
         initPositionTop = animation.value;
@@ -110,11 +119,47 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
                 onVerticalDragStart: verticalDragStart,
                 onVerticalDragUpdate: verticalDragUpdate,
                 onVerticalDragEnd: verticalDragEnd,
-
                 child: Container(
                   width: size.width,height: drawerHeight,
-                  color: Colors.blueAccent,
-                  child: Text('drawer lv1'),
+                  color: Colors.white,
+                  child: Stack(
+                    children: <Widget>[
+                      ///search
+                      Container(
+                        alignment: Alignment.center,
+                        color: Colors.pink,
+                        width: size.width,height: searchHeight - minHeight,
+                        child: Text('我是搜索'),
+                      ),
+                      ///transform
+                      Positioned(
+                        top: searchHeight - minHeight,
+                        child: Container(
+                          alignment: Alignment.center,
+                          color: Colors.white,
+                          width: size.width,height: rowH * 3,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              normalRow(),
+                              normalRow(),
+                              normalRow()
+                            ],
+                          ),
+                        ),
+                      ),
+                      ///expand area
+                      Positioned(
+                        top: expandPosTop + topArea,
+                        child: Container(
+                          color: Colors.lightGreen,
+                          alignment: Alignment.topCenter,
+                          width: size.width,height: drawerHeight - searchHeight -rowH,///这里需要在滚动时向下滑动
+                          child: Text('我是扩展区域'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             )
@@ -122,6 +167,60 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
           ],
         ),
+      ),
+    );
+  }
+
+  ///刷新 扩展区域的 position top值
+  ///这里的差值是 rowH * 2
+  refreshExpandWidgetTop(){
+    double progress = (initPositionTop-top2).abs() /(top2 - top1).abs();
+    if(drawerLvl == DrawerLvl.LVL2){
+      ///lvl2 滑向 lvl1时 不做处理
+      if(initPositionTop > top2) return;
+      log('progress', '$progress');
+      if(direction != null && direction == SlideDirection.Up){
+        topArea =  progress * (rowH*2).clamp(0, rowH*2);
+
+      }else if(direction != null && direction == SlideDirection.Down){
+        topArea =   (progress * (rowH*2).clamp(0, rowH*2));
+
+      }
+    }else if(drawerLvl == DrawerLvl.LVL1){
+      ///lvl2 滑向 lvl1时 不做处理
+      if(initPositionTop > top2) return;
+      if(direction != null && direction == SlideDirection.Up){
+        topArea = (progress) * (rowH*2).clamp(0, rowH*2);
+
+      }else if(direction != null && direction == SlideDirection.Down){
+        topArea =   ((progress) * (rowH*2).clamp(0, rowH*2));
+
+      }
+    }
+  }
+
+  ///变形金刚区的单行高
+  final double rowH = 75;
+
+  Widget normalRow(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        normalCircle(),
+        normalCircle(),
+        normalCircle(),
+        normalCircle(),
+      ],
+    );
+  }
+
+  final double circleSize = 65;
+  Widget normalCircle(){
+    return Container(
+      width:circleSize ,height: circleSize,
+      decoration: BoxDecoration(
+        color: Colors.deepOrange,
+        shape: BoxShape.circle
       ),
     );
   }
@@ -174,6 +273,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
     initPositionTop += dis;
     lastPos = details.globalPosition;
+    refreshExpandWidgetTop();
     setState(() {
 
     });
@@ -181,7 +281,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
   void verticalDragEnd(DragEndDetails details){
     adjustPositionTop(details);
-    direction = null;
+    //direction = null;
     //lastPos = Offset.zero;
   }
 
