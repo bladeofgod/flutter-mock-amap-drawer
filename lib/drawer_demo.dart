@@ -42,9 +42,16 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
   final double paddingTop = 70;
 
+  double threshold1To2;
+  double threshold2To3;
+
   DrawerDemoState(this.size){
     drawerHeight = size.height-paddingTop;
+    threshold1To2 = size.height/3;
+    threshold2To3 = size.height - 200;
   }
+
+
 
   AnimationController animationController;
   Animation animation;
@@ -77,11 +84,12 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
     animationController.addListener(() {
       if(animation == null) return;
       setState(() {
-        //debugPrint('${animation.value}');
+        log('animation', '${animation.value}');
         initPositionTop = animation.value;
       });
 
     });
+
   }
 
   @override
@@ -122,12 +130,13 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
   final double cacheDy = 5.0;
 
   void verticalDragStart(DragStartDetails details){
+    animation = null;
     if(animationController.isAnimating){
       animationController.stop();
-      animation = null;
     }
     animationController.reset();
     lastPos = details.globalPosition;
+    log('start', '$initPositionTop');
   }
 
   void verticalDragUpdate(DragUpdateDetails details){
@@ -144,7 +153,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
     }else if(direction == SlideDirection.Down){
       if(initPositionTop >= top3-cacheDy) return;
     }
-    debugPrint('$direction');
+    log('update', '$initPositionTop');
 
     initPositionTop += dis;
     lastPos = details.globalPosition;
@@ -159,27 +168,57 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
     //lastPos = Offset.zero;
   }
 
-  void adjustPositionTop()async{
+  void adjustPositionTop(){
     switch(direction){
       case SlideDirection.Up:
         if(initPositionTop >= top1 && initPositionTop <= top2){
           ///在1、2级之间
 
-          if(initPositionTop <= size.height/2){
+          if(initPositionTop <= threshold1To2){
             ///小于二分之一屏幕高度 滚向top1
 
-            animation = Tween<double>(begin: initPositionTop,end:top1 ).animate(animationController);
-            await animationController.forward();
+            slideTo(begin:initPositionTop, end:top1);
           }else{
             ///滑向top2
-            animation = Tween<double>(begin: initPositionTop,end: top2).animate(animationController);
-            await animationController.forward();
+
+            slideTo(begin: initPositionTop,end: top2);
           }
+        }else if(initPositionTop <= top2 && initPositionTop >= top3){
+          ///2-3之间
+          if(initPositionTop <= threshold2To3){
+            ///滑向2
+
+          }else{
+            ///滑向3
+          }
+
         }
         break;
       case SlideDirection.Down:
+        if(initPositionTop >= top1 && initPositionTop <= top2){
+          ///在1、2级之间
+
+          if(initPositionTop <= threshold1To2){
+            ///小于二分之一屏幕高度 滚向top1
+
+            slideTo(begin: initPositionTop,end:top1);
+          }else{
+            ///滑向top2
+
+            slideTo(begin: initPositionTop,end: top2);
+          }
+        }
         break;
     }
+  }
+
+  slideTo({double begin,double end})async{
+    animation = Tween<double>(begin: begin,end:end ).animate(animationController);
+    await animationController.forward();
+  }
+
+  log(String title,String info){
+    debugPrint('$title ---- $info');
   }
 
 
