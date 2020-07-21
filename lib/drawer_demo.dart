@@ -36,7 +36,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
   ///最大高度
   double drawerHeight;
   ///中等高度
-  final double searchHeight = 250;
+  final double searchHeight = 300;
   ///最小高度
   final double minHeight = 150 ;
 
@@ -48,7 +48,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
   DrawerDemoState(this.size){
     drawerHeight = size.height-paddingTop;
     threshold1To2 = size.height/3;
-    threshold2To3 = size.height - 200;
+    threshold2To3 = size.height - 250;
   }
 
 
@@ -183,13 +183,14 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
             slideTo(begin: initPositionTop,end: top2);
           }
-        }else if(initPositionTop <= top2 && initPositionTop >= top3){
+        }else if(initPositionTop >= top2 && initPositionTop <= top3){
           ///2-3之间
           if(initPositionTop <= threshold2To3){
             ///滑向2
-
+            slideTo(begin: initPositionTop,end: top2);
           }else{
             ///滑向3
+            slideTo(begin: initPositionTop,end: top3);
           }
 
         }
@@ -207,6 +208,16 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
             slideTo(begin: initPositionTop,end: top2);
           }
+        }else if(initPositionTop >= top2 && initPositionTop <= top3){
+          ///2-3之间
+          if(initPositionTop <= threshold2To3){
+            ///滑向2
+            slideTo(begin: initPositionTop,end: top2);
+          }else{
+            ///滑向3
+            slideTo(begin: initPositionTop,end: top3);
+          }
+
         }
         break;
     }
