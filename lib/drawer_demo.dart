@@ -182,7 +182,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
   refreshExpandWidgetTop(){
     double progress = (initPositionTop-top2).abs() /(top2 - top1).abs();
     if(drawerLvl == DrawerLvl.LVL2){
-      ///lvl2 滑向 lvl1时 不做处理
+      ///lvl2 滑向 lvl3时 不做处理
       if(initPositionTop > top2) return;
       log('progress', '$progress');
       ///当初为了加别的，这里的代码写的有点多余
@@ -194,7 +194,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
       }
     }else if(drawerLvl == DrawerLvl.LVL1){
-      ///lvl2 滑向 lvl1时 不做处理
+      ///lvl2 滑向 lvl3时 不做处理
       if(initPositionTop > top2) return;
       ///当初为了加别的，这里的代码写的有点多余
       if(direction != null && direction == SlideDirection.Up){
