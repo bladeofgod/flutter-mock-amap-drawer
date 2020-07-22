@@ -43,6 +43,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
   final double paddingTop = 70;
 
+  ///层级之间的阈值
   double threshold1To2;
   double threshold2To3;
 
@@ -59,7 +60,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
   ///内部 扩展区widget的 position top
   double expandPosTop;
-
+  ///drawer 内部 多功能区域的滑动范围 0  -  rowH*2
   double topArea ;
 
   ///stack 中 根container 的position 的top 值的三种情况
@@ -72,7 +73,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
 
   ///抽屉层级
   DrawerLvl drawerLvl = DrawerLvl.LVL2;
-
+  ///滑动方向
   SlideDirection direction;
 
   @override
