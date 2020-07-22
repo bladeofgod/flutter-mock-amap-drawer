@@ -137,13 +137,18 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
                         child: Container(
                           alignment: Alignment.center,
                           color: Colors.white,
-                          width: size.width,height: rowH * 3,
+                          width: size.width,height: rowH * 3+20,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               normalRow(),
                               normalRow(),
-                              normalRow()
+                              Container(
+                                color: Colors.grey[300],
+                                width: size.width,height: rowH,
+                                alignment: Alignment.topCenter,
+                                child: Text('常去的地方',style: TextStyle(fontSize: 18,color: Colors.black),),
+                              )
                             ],
                           ),
                         ),
