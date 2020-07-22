@@ -185,6 +185,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
       ///lvl2 滑向 lvl1时 不做处理
       if(initPositionTop > top2) return;
       log('progress', '$progress');
+      ///当初为了加别的，这里的代码写的有点多余
       if(direction != null && direction == SlideDirection.Up){
         topArea =  progress * (rowH*2).clamp(0, rowH*2);
 
@@ -195,6 +196,7 @@ class DrawerDemoState extends State<DrawerDemo> with SingleTickerProviderStateMi
     }else if(drawerLvl == DrawerLvl.LVL1){
       ///lvl2 滑向 lvl1时 不做处理
       if(initPositionTop > top2) return;
+      ///当初为了加别的，这里的代码写的有点多余
       if(direction != null && direction == SlideDirection.Up){
         topArea = (progress) * (rowH*2).clamp(0, rowH*2);
 
